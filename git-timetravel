@@ -62,14 +62,33 @@ Options:
 
 opt = docopt(doc,None,True,__version__)
 
-print opt
-
 def set_anchor():
-    ''
+    a = get_anchor()
+    if a != None:
+        print "Error: Will not set timetravel anchor, because one is set already"
+        return
     #only set anchor if none is set
+    f = open('.git/timetravel_anchor','w+')
+    f.write('master')
+    f.close()
 
 def get_anchor():
     ''
+    try:
+        f = open('.git/timetravel_anchor','r')
+    except:
+        return None
+    if f:
+        a = f.readline()
+        f.close()
+        if a == '':
+            return None
+        else:
+            #test if a is a valid anchor
+            return a.strip()
+    else:
+        return None     
+
     #if no anchor is set return None
 
 def get_num(n):
@@ -78,15 +97,30 @@ def get_num(n):
     return "1"
 
 def travel_to_anchor():
-    #travel to anchor
+    #travel to anchor / git checkout (anchor)
+    a = get_anchor()
+    if a == None:
+        print "Error: No anchor found, can't travel."
+        exit(0)
+    #validation of anchor?
+    #stash local changes so there's no problem traveling
+    stash_changes()
+    p = subprocess.Popen(['git','checkout',a], stdout=subprocess.PIPE)
     #then remove the anchor
+    os.unlink('.git/timetravel_anchor')
     #then apply stashed changes
-    ''
+    p = subprocess.Popen(['git','stash','apply'], stdout=subprocess.PIPE)
 
 def stash_changes():
+    if not are_there_changes():
+        return #nothing to stash my friend
+
     #find out if there are local changes
     #if so create stash
-    ''
+    p = subprocess.call('git stash',shell=True)
+    if p != 0:
+        print "Error while running git stash... not secure to continue"
+        exit(1)
 
 def are_there_changes():
     p = subprocess.Popen(['git','diff'], stdout=subprocess.PIPE)
@@ -100,29 +134,29 @@ def are_there_changes():
     else:
         return True
 
-print are_there_changes()
+def travel_to(destination):
+    print "Charging timemachine with energy... 1 ... 2 ... 3 ... "
+    num = get_num(opt['NUM'])
+    set_anchor()
+    stash_changes() 
+    print 'git checkout '+destination
+    subprocess.call('git checkout '+destination,shell=True)
 
-exit(0)
-
-if opt['anchor']:
-    ''
-    #back to the future
+if opt['anchor']: #going back to the way things were #back to the future
+    travel_to_anchor()
     exit(0)
 
 elif opt['back']:
-    #git checkout HEAD~1
-    print "hello"
-    anchor = get_anchor()
     num = get_num(opt['NUM'])
-    if not anchor:
-        anchor = set_anchor()
-    subprocess.call('git checkout./'+opt['--output'],shell=True)
+    travel_to("HEAD~"+num)
 
-elif opt['forward']:
-    print "forward"
+elif opt['forward']: #similar to back but also very different
+    #first we have to go to the anchor
+    #then we can go forward by not going backward too much
+    #while keeping the original anchor
+    num = get_num(opt['NUM'])
+    travel_to_anchor()
 
-elif opt['<commit>']:
-    print "commit"
-
-
+elif opt['<commit>']: #similar to back
+    travel_to(opt['<commit>'])
 
