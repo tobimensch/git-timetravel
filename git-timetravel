@@ -86,6 +86,23 @@ def travel_to_anchor():
 def stash_changes():
     #find out if there are local changes
     #if so create stash
+    ''
+
+def are_there_changes():
+    p = subprocess.Popen(['git','diff'], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    if p.returncode != 0:
+        print "Error while running git diff... not secure to continue"
+        exit(1)
+    if out == '':
+        #apparently no changes
+        return False
+    else:
+        return True
+
+print are_there_changes()
+
+exit(0)
 
 if opt['anchor']:
     ''
