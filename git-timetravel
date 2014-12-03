@@ -15,8 +15,6 @@ import re
 import datetime
 import subprocess
 import tempfile
-import pprint
-import gzip
 
 from docopt import docopt
 
@@ -24,12 +22,13 @@ __all__ = ['git-timetravel']
 __version__ = '0.1.0'
 
 doc ='''
-usage: git-timetravel <commit>
-       git-timetravel back [num]
-       git-timetravel forward [num]
-       git-timetravel anchor
-       git-timetravel --help
-       git-timetravel --version
+Usage:
+  git-timetravel back [NUM]
+  git-timetravel forward [NUM]
+  git-timetravel anchor
+  git-timetravel <commit>
+  git-timetravel --help
+  git-timetravel --version
 
 Travel in time through your git repository.
 Then go back to the future with git-timetravel anchor,
@@ -48,14 +47,14 @@ arguments:
                                will refuse going forward
 
 commands:
-  back [num]                   go back by [num] commits
+  back [NUM]                   go back by [NUM] commits
                                (default is 1)
-  forward [num]                go forward by [num] commits
+  forward [NUM]                go forward by [NUM] commits
                                (default is 1)
   anchor                       get back to the anchor including
                                any local changes
 
-options:
+Options:
   -h, --help                   show this help message and exit
   -v, --version                display version information
 
@@ -63,12 +62,50 @@ options:
 
 opt = docopt(doc,None,True,__version__)
 
-if opt['now']:
+print opt
+
+def set_anchor():
+    ''
+    #only set anchor if none is set
+
+def get_anchor():
+    ''
+    #if no anchor is set return None
+
+def get_num(n):
+    if n:
+        return n
+    return "1"
+
+def travel_to_anchor():
+    #travel to anchor
+    #then remove the anchor
+    #then apply stashed changes
+    ''
+
+def stash_changes():
+    #find out if there are local changes
+    #if so create stash
+
+if opt['anchor']:
     ''
     #back to the future
     exit(0)
 
-if opt['num']:
+elif opt['back']:
+    #git checkout HEAD~1
     print "hello"
+    anchor = get_anchor()
+    num = get_num(opt['NUM'])
+    if not anchor:
+        anchor = set_anchor()
+    subprocess.call('git checkout./'+opt['--output'],shell=True)
+
+elif opt['forward']:
+    print "forward"
+
+elif opt['<commit>']:
+    print "commit"
+
 
 
