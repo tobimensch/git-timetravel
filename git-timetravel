@@ -95,7 +95,7 @@ def get_anchor():
 
     #if no anchor is set return None
 
-def read_head()
+def read_head():
     p = subprocess.Popen(['git','symbolic-ref','HEAD'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
