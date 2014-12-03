@@ -1,0 +1,74 @@
+#!/usr/bin/python
+"""travel back in time in a git repository, by just entering
+ * a number of commits you want to go back (or a hash).
+ * When you want get back to 'now' including the local changes
+ * git-timetravel now takes you back into the future.
+ * Repository and issue-tracker: https://github.com/docopt/docopt
+ * Licensed under terms of MIT license (see LICENSE-MIT)
+ * Copyright (c) 2013 Vladimir Keleshev, vladimir@keleshev.com
+ * Copyright (c) 2014 Tobias Glaesser
+
+"""
+import os
+import sys
+import re
+import datetime
+import subprocess
+import tempfile
+import pprint
+import gzip
+
+from docopt import docopt
+
+__all__ = ['git-timetravel']
+__version__ = '0.1.0'
+
+doc ='''
+usage: git-timetravel <commit>
+       git-timetravel back [num]
+       git-timetravel forward [num]
+       git-timetravel anchor
+       git-timetravel --help
+       git-timetravel --version
+
+Travel in time through your git repository.
+Then go back to the future with git-timetravel anchor,
+not losing any local changes.
+
+When you first go back using <commit> or back [num]
+git-timetravel remembers where you were as the anchor.
+If you then use the anchor command at any time you'll be taken
+back to that anchor.
+
+This tool is intended for trying earlier revisions of code,
+i.e. to test for regressions.
+
+arguments:
+  <commit>                     go back to specific commit
+                               will refuse going forward
+
+commands:
+  back [num]                   go back by [num] commits
+                               (default is 1)
+  forward [num]                go forward by [num] commits
+                               (default is 1)
+  anchor                       get back to the anchor including
+                               any local changes
+
+options:
+  -h, --help                   show this help message and exit
+  -v, --version                display version information
+
+'''
+
+opt = docopt(doc,None,True,__version__)
+
+if opt['now']:
+    ''
+    #back to the future
+    exit(0)
+
+if opt['num']:
+    print "hello"
+
+
