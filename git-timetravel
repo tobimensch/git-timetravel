@@ -62,6 +62,11 @@ Options:
 opt = docopt(doc,None,True,__version__)
 
 def set_anchor():
+    head = read_head()
+    if head == None:
+        print "Error: couldn't read HEAD, exiting"
+        exit(0)
+
     a = get_anchor()
     if a != None:
         print "Error: Will not set timetravel anchor, because one is set already"
@@ -89,6 +94,15 @@ def get_anchor():
         return None     
 
     #if no anchor is set return None
+
+def read_head()
+    p = subprocess.Popen(['git','symbolic-ref','HEAD'], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    if p.returncode != 0:
+        print "Error while running git symbolic-ref HEAD ... not secure to continue"
+        exit(1)
+    head = out.strip()
+    return head
 
 def get_num(n):
     if n:
