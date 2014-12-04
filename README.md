@@ -52,6 +52,50 @@ Or you create a patch, or you just make a note in your head. Now is the time to 
 Your timetraveling session is now over. With your new knowledge from the past you can now finally fix that nasty
 regression.
 
+# CLI
+
+```
+Usage:
+  git-timetravel back [NUM]
+  git-timetravel forward [NUM]
+  git-timetravel anchor
+  git-timetravel <commit>
+  git-timetravel --print-anchor
+  git-timetravel --help
+  git-timetravel --version
+
+Travel in time through your git repository.
+Then go back to the future with git-timetravel anchor,
+not losing any local changes.
+
+When you first go back using <commit> or back [num]
+git-timetravel remembers where you were as the anchor.
+If you then use the anchor command at any time you'll be taken
+back to that anchor.
+
+This tool is intended for trying earlier revisions of code,
+i.e. to test for regressions.
+
+arguments:
+  <commit>                     go back to specific commit
+                               will refuse going forward
+
+commands:
+  back [NUM]                   go back by [NUM] commits
+                               (default is 1)
+  forward [NUM]                go forward by [NUM] commits
+                               (default is 1)
+  anchor                       get back to the anchor including
+                               any local changes
+
+Options:
+  -h, --help                   show this help message and exit
+  -v, --version                display version information
+  -a, --print-anchor           prints the saved anchor
+
+```
+
+
 # Bugs / Development / Testing / Feedback
 
 The github issues page of git-timetravel is the right place for all of that:
