@@ -20,7 +20,7 @@ from docopt import docopt
 __all__ = ['git-timetravel']
 __version__ = '0.2.0'
 
-doc ='''
+doc = '''
 Usage:
   git-timetravel back [NUM]
   git-timetravel forward [NUM]
@@ -61,7 +61,8 @@ Options:
 
 '''
 
-opt = docopt(doc,None,True,__version__)
+opt = docopt(doc, None, True, __version__)
+
 
 def set_anchor():
     head = read_head()
@@ -71,17 +72,20 @@ def set_anchor():
 
     a = get_anchor()
     if a != None:
-        print("Error: Will not set timetravel anchor, because one is set already")
+        print(
+            "Error: Will not set timetravel anchor, because one is set already"
+        )
         return
     #only set anchor if none is set
-    f = open('.git/timetravel_anchor','w+')
+    f = open('.git/timetravel_anchor', 'w+')
     f.write(head.decode())
     f.close()
+
 
 def get_anchor():
     ''
     try:
-        f = open('.git/timetravel_anchor','r')
+        f = open('.git/timetravel_anchor', 'r')
     except:
         return None
     if f:
@@ -93,23 +97,29 @@ def get_anchor():
             #test if a is a valid anchor
             return a.strip()
     else:
-        return None     
+        return None
 
     #if no anchor is set return None
 
+
 def read_head():
-    p = subprocess.Popen(['git','symbolic-ref','--short','HEAD'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['git', 'symbolic-ref', '--short', 'HEAD'],
+                         stdout=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
-        print("Error while running git symbolic-ref HEAD ... not secure to continue")
+        print(
+            "Error while running git symbolic-ref HEAD ... not secure to continue"
+        )
         exit(1)
     head = out.strip()
     return head
+
 
 def get_num(n):
     if n:
         return n
     return "1"
+
 
 def travel_to_anchor():
     #travel to anchor / git checkout (anchor)
@@ -120,33 +130,36 @@ def travel_to_anchor():
     #validation of anchor?
     #stash local changes so there's no problem traveling
     stash_changes()
-    p = subprocess.Popen(['git','checkout',a], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['git', 'checkout', a], stdout=subprocess.PIPE)
     #then remove the anchor
     os.unlink('.git/timetravel_anchor')
     #then apply stashed changes
     stash_apply()
 
+
 def stash_apply():
     #find out if there are local changes
     #if so create stash
-    p = subprocess.call('git stash apply',shell=True)
+    p = subprocess.call('git stash apply', shell=True)
     if p != 0:
         print("Error while running git stash... not secure to continue")
         exit(1)
+
 
 def stash_changes():
     if not are_there_changes():
-        return #nothing to stash my friend
+        return  #nothing to stash my friend
 
     #find out if there are local changes
     #if so create stash
-    p = subprocess.call('git stash',shell=True)
+    p = subprocess.call('git stash', shell=True)
     if p != 0:
         print("Error while running git stash... not secure to continue")
         exit(1)
 
+
 def are_there_changes():
-    p = subprocess.Popen(['git','diff'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['git', 'diff'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
         print("Error while running git diff... not secure to continue")
@@ -157,26 +170,28 @@ def are_there_changes():
     else:
         return True
 
+
 def travel_to(destination):
     print("Charging timemachine with energy... 1 ... 2 ... 3 ... ")
     set_anchor()
-    stash_changes() 
-    print('git checkout '+destination)
-    subprocess.call('git checkout '+destination,shell=True)
+    stash_changes()
+    print('git checkout ' + destination)
+    subprocess.call('git checkout ' + destination, shell=True)
+
 
 if opt['--print-anchor']:
     print(get_anchor())
     exit(0)
 
-if opt['anchor']: #going back to the way things were #back to the future
+if opt['anchor']:  #going back to the way things were #back to the future
     travel_to_anchor()
     exit(0)
 
 elif opt['back']:
     num = get_num(opt['NUM'])
-    travel_to("HEAD~"+num)
+    travel_to("HEAD~" + num)
 
-elif opt['forward']: #similar to back but also very different
+elif opt['forward']:  #similar to back but also very different
     #first we have to go to the anchor
     #then we can go forward by not going backward too much
     #while keeping the original anchor
@@ -185,26 +200,30 @@ elif opt['forward']: #similar to back but also very different
         print("Error: No anchor found, can't travel forward")
         exit(1)
 
-    p = subprocess.Popen(['git','rev-parse','HEAD'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
-        print("Error while runing git rev-parse HEAD ... not secure to continue")
+        print(
+            "Error while runing git rev-parse HEAD ... not secure to continue")
         exit(1)
     current_commit = out.strip()
     travel_to_anchor()
-    p = subprocess.Popen(['git','rev-list','--reverse','HEAD'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['git', 'rev-list', '--reverse', 'HEAD'],
+                         stdout=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
-        print("Error while runing git rev-list --reverse HEAD ... not secure to continue")
+        print(
+            "Error while runing git rev-list --reverse HEAD ... not secure to continue"
+        )
         exit(1)
     found = False
     num = int(get_num(opt['NUM']).strip())
-    target_commit=''
+    target_commit = ''
     for line in out.split("\n"):
         if found == True:
-            num-=1
+            num -= 1
             if num == 0:
-                target_commit=line.strip()
+                target_commit = line.strip()
                 break
             continue
         if line.strip() == current_commit:
@@ -212,12 +231,13 @@ elif opt['forward']: #similar to back but also very different
     if target_commit != '':
         travel_to(target_commit)
 
-elif opt['<commit>']: #similar to back
+elif opt['<commit>']:  #similar to back
     #find out if <commit> is in past commits relative to current commit
-    p = subprocess.Popen(['git','rev-list','HEAD'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['git', 'rev-list', 'HEAD'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
-        print("Error while runing git rev-list HEAD ... not secure to continue")
+        print(
+            "Error while runing git rev-list HEAD ... not secure to continue")
         exit(1)
     found = False
     for line in out.split("\n"):
@@ -226,4 +246,3 @@ elif opt['<commit>']: #similar to back
 
     if found == True:
         travel_to(opt['<commit>'])
-
