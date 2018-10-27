@@ -1,7 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """travel back in time in a git repository, by just entering
  * a number of commits you want to go back (or a hash).
- * When you want get back to 'now' including the local changes
+ * When you want to get back to 'now' including the local changes
  * git-timetravel now takes you back into the future.
  * Repository and issue-tracker: https://github.com/tobimensch/git-timetravel
  * Licensed under terms of MIT license (see LICENSE-MIT)
