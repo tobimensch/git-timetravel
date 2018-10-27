@@ -75,7 +75,7 @@ def set_anchor():
         return
     #only set anchor if none is set
     f = open('.git/timetravel_anchor','w+')
-    f.write(head.encode())
+    f.write(head.decode())
     f.close()
 
 def get_anchor():
@@ -85,7 +85,7 @@ def get_anchor():
     except:
         return None
     if f:
-        a = f.readline().decode()
+        a = f.readline()
         f.close()
         if a == '':
             return None
@@ -98,7 +98,7 @@ def get_anchor():
     #if no anchor is set return None
 
 def read_head():
-    p = subprocess.Popen(['git','symbolic-ref','HEAD'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['git','symbolic-ref','--short','HEAD'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
         print("Error while running git symbolic-ref HEAD ... not secure to continue")
