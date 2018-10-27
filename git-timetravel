@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """travel back in time in a git repository, by just entering
  * a number of commits you want to go back (or a hash).
  * When you want to get back to 'now' including the local changes
@@ -18,7 +18,7 @@ import tempfile
 from docopt import docopt
 
 __all__ = ['git-timetravel']
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 doc ='''
 Usage:
