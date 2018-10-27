@@ -75,7 +75,7 @@ def set_anchor():
         return
     #only set anchor if none is set
     f = open('.git/timetravel_anchor','w+')
-    f.write(head)
+    f.write(head.encode())
     f.close()
 
 def get_anchor():
@@ -85,7 +85,7 @@ def get_anchor():
     except:
         return None
     if f:
-        a = f.readline()
+        a = f.readline().decode()
         f.close()
         if a == '':
             return None
