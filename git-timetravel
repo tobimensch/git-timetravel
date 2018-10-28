@@ -63,13 +63,22 @@ Options:
 
 opt = docopt(doc, None, True, __version__)
 
-def get_toplevel_directory():
-    p = subprocess.Popen(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE)
+def subprocess_popen_or_panic(arguments):
+    p = subprocess.Popen(arguments, stdout=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
-        print(
-            "Error while runing git rev-parse --show-toplevel ... not secure to continue")
+        print("Error while running `" + arguments.join(' ') + "`. Not save to continue.")
         exit(1)
+    return out
+
+def subprocess_call_or_panic(call):
+    p = subprocess.call(call, shell=True)
+    if p != 0:
+        print("Error while running `" + call + "`. Not save to continue.")
+        exit(1)
+
+def get_toplevel_directory():
+    out = subprocess_popen_or_panic(['git', 'rev-parse', '--show-toplevel'])
     return out.strip().decode()
 
 def set_anchor():
@@ -111,17 +120,9 @@ def get_anchor():
 
 
 def read_head():
-    p = subprocess.Popen(['git', 'symbolic-ref', '--short', 'HEAD'],
-                         stdout=subprocess.PIPE)
-    out, err = p.communicate()
-    if p.returncode != 0:
-        print(
-            "Error while running git symbolic-ref HEAD ... not secure to continue"
-        )
-        exit(1)
+    out = subprocess_popen_or_panic(['git', 'symbolic-ref', '--short', 'HEAD'])
     head = out.strip()
     return head
-
 
 def get_num(n):
     if n:
@@ -148,10 +149,7 @@ def travel_to_anchor():
 def stash_apply():
     #find out if there are local changes
     #if so create stash
-    p = subprocess.call('git stash apply', shell=True)
-    if p != 0:
-        print("Error while running git stash... not secure to continue")
-        exit(1)
+    subprocess_call_or_panic('git stash apply')
 
 
 def stash_changes():
@@ -160,18 +158,10 @@ def stash_changes():
 
     #find out if there are local changes
     #if so create stash
-    p = subprocess.call('git stash', shell=True)
-    if p != 0:
-        print("Error while running git stash... not secure to continue")
-        exit(1)
-
+    subprocess_call_or_panic('git stash')
 
 def are_there_changes():
-    p = subprocess.Popen(['git', 'diff'], stdout=subprocess.PIPE)
-    out, err = p.communicate()
-    if p.returncode != 0:
-        print("Error while running git diff... not secure to continue")
-        exit(1)
+    out = subprocess_popen_or_panic(['git', 'diff'])
     if out == '':
         #apparently no changes
         return False
@@ -208,22 +198,10 @@ elif opt['forward']:  #similar to back but also very different
         print("Error: No anchor found, can't travel forward")
         exit(1)
 
-    p = subprocess.Popen(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE)
-    out, err = p.communicate()
-    if p.returncode != 0:
-        print(
-            "Error while runing git rev-parse HEAD ... not secure to continue")
-        exit(1)
+    out = subprocess_popen_or_panic(['git', 'rev-parse', 'HEAD'])
     current_commit = out.strip()
     travel_to_anchor()
-    p = subprocess.Popen(['git', 'rev-list', '--reverse', 'HEAD'],
-                         stdout=subprocess.PIPE)
-    out, err = p.communicate()
-    if p.returncode != 0:
-        print(
-            "Error while runing git rev-list --reverse HEAD ... not secure to continue"
-        )
-        exit(1)
+    out = subprocess_popen_or_panic(['git', 'rev-list', '--reverse', 'HEAD'])
     found = False
     num = int(get_num(opt['NUM']).strip())
     target_commit = ''
@@ -241,12 +219,7 @@ elif opt['forward']:  #similar to back but also very different
 
 elif opt['<commit>']:  #similar to back
     #find out if <commit> is in past commits relative to current commit
-    p = subprocess.Popen(['git', 'rev-list', 'HEAD'], stdout=subprocess.PIPE)
-    out, err = p.communicate()
-    if p.returncode != 0:
-        print(
-            "Error while runing git rev-list HEAD ... not secure to continue")
-        exit(1)
+    out = subprocess_popen_or_panic(['git', 'rev-list', 'HEAD'])
     found = False
     for line in out.split("\n"):
         if line.strip() == opt['<commit>']:
