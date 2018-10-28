@@ -63,6 +63,14 @@ Options:
 
 opt = docopt(doc, None, True, __version__)
 
+def get_toplevel_directory():
+    p = subprocess.Popen(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    if p.returncode != 0:
+        print(
+            "Error while runing git rev-parse --show-toplevel ... not secure to continue")
+        exit(1)
+    return out.strip().decode()
 
 def set_anchor():
     head = read_head()
@@ -77,7 +85,7 @@ def set_anchor():
         )
         return
     #only set anchor if none is set
-    f = open('.git/timetravel_anchor', 'w+')
+    f = open(get_toplevel_directory() + '/.git/timetravel_anchor', 'w+')
     f.write(head.decode())
     f.close()
 
@@ -85,7 +93,7 @@ def set_anchor():
 def get_anchor():
     ''
     try:
-        f = open('.git/timetravel_anchor', 'r')
+        f = open(get_toplevel_directory() + '/.git/timetravel_anchor', 'r')
     except:
         return None
     if f:
@@ -132,7 +140,7 @@ def travel_to_anchor():
     stash_changes()
     p = subprocess.Popen(['git', 'checkout', a], stdout=subprocess.PIPE)
     #then remove the anchor
-    os.unlink('.git/timetravel_anchor')
+    os.unlink(get_toplevel_directory() + '/.git/timetravel_anchor')
     #then apply stashed changes
     stash_apply()
 
