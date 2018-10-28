@@ -7,7 +7,9 @@ Unless you don't have python, then you need to get python first. And also the do
 # Description
 
 git-timetravel makes it easier for git users to checkout previous commits and to go back and forth between them. I.e. they can go back by one commit, then try to see if a regression occurs at that state, then they can go back by one more commit, try again, go back by one more commit, try again, and so on.
-They can also go back a number of commits or even forward. When they're done they just type "git timetravel anchor" and git-timetravel takes them back to (the future) where they were before they started to explore older commits using git-timetravel. The local changes, if there were any, will be restored, so you'll not have to worry that any of your data will be lost.
+They can also go back a number of commits or even forward. When they're done they just type "git timetravel anchor" and git-timetravel takes them back to (the future) where they were before they started to explore older commits using git-timetravel.
+
+Any local changes will be restored through stashing, so you don't have to worry that any of your work in progress will be lost.
 
 When you're in one of the older commits, be aware that the HEAD is set to that commit and if you make changes and commit that this will create a new branch at this point, and when you return to the anchor, then this branch will be a side-branch to your real branch. Garbage collection will eventually eliminate this branch. But git-timetravel also stashes changes you make to earlier commits for you. So when you don't commit them you could just later try to merge those changes when you're back at the anchor.
 
